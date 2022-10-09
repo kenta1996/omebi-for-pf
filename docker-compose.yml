@@ -1,0 +1,51 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    container_name: nginx_ecs
+    volumes:
+        - ./src:/application
+        - ./docker/nginx/local/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+        - 8083:80
+    expose:
+        - 8083
+    depends_on:
+        - laravel
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_NAME}
+      - DB_USERNAME=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - "TZ=Asia/Tokyo"
+
+  laravel:
+    build:
+      context: .
+      dockerfile: ./docker/laravel/Dockerfile
+    container_name: laravel_ecs
+    volumes:
+        - ./src:/application
+
+  db:
+    build:
+      context: .
+      dockerfile: ./docker/mysql/Dockerfile
+    container_name: mysql_ecs
+    ports:
+      - ${DB_PORT}:3306
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - mysql-volume:/var/lib/mysql
+
+volumes:
+  mysql-volume:

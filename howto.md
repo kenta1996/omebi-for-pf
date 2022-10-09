@@ -1,0 +1,2 @@
+- docker build -t ecs-hands-on/composer:latest -f Dockerfile . 
+- docker run -v $(pwd):/application ecs-hands-on/composer:latest composer create-project --prefer-dist laravel/laravel src "9.*"
