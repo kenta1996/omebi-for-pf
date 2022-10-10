@@ -37,7 +37,7 @@ services:
       dockerfile: ./docker/mysql/Dockerfile
     container_name: mysql_ecs
     ports:
-      - ${DB_PORT}:3306
+      - ${DB_PORT:-3306}:3306
     environment:
       MYSQL_DATABASE: ${DB_NAME:-db_ecs}
       MYSQL_USER: ${DB_USER:-dbuser}
