@@ -18,9 +18,9 @@ services:
       - DB_CONNECTION=mysql
       - DB_HOST=db
       - DB_PORT=3306
-      - DB_DATABASE=${DB_NAME}
-      - DB_USERNAME=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_NAME:-db_ecs}
+      - DB_USERNAME=${DB_USER:-dbuser}
+      - DB_PASSWORD=${DB_PASSWORD:-password123}
       - "TZ=Asia/Tokyo"
 
   laravel:
@@ -39,10 +39,10 @@ services:
     ports:
       - ${DB_PORT}:3306
     environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:-db_ecs}
+      MYSQL_USER: ${DB_USER:-dbuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password123}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-password}
       TZ: 'Asia/Tokyo'
     volumes:
       - mysql-volume:/var/lib/mysql
