@@ -2,6 +2,7 @@ FROM php:8.1-fpm-bullseye
 
 COPY ./docker/laravel/php.ini /usr/local/etc/php/php.ini
 COPY ./src /application
+# COPY --chown=www-data:www-data ./src /application
 WORKDIR /application
 
 COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
