@@ -26,7 +26,7 @@ jobs:
           aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-          
+
           # Assume Roleする対象のIAMロールのARNの指定と権限の有効期間を指定
           role-to-assume: ${{ secrets.PROD_AWS_ASSUME_ROLE_ARN }}
           role-duration-seconds: 1800
@@ -34,10 +34,12 @@ jobs:
       - name: Set env vars for prod
         # if: github.ref == 'refs/heads/main'
         run: echo "ENV_NAME=prod" >> $GITHUB_ENV
-
       - uses: actions/checkout@v2
+      
+      # コンテナの起動
+      # - run: docker-compose up -d --build
       - run: docker-compose up -d --build laravel nginx
-
+      
       # PHPパッケージのインストールとキャッシュ
       - name: Cache composer
         id: cache-composer
@@ -47,7 +49,7 @@ jobs:
           key: composer-v1-${{ hashFiles('src/composer.lock') }}
       - run: docker-compose exec -T laravel composer install -n --prefer-dist --no-dev
         if: ${{ !steps.cache-composer.outputs.cache-hit }}
-      
+
       # node関連のパッケージのインストールとキャッシュ
       - name: Cache npm
         id: cache-npm-ci
@@ -55,15 +57,22 @@ jobs:
         with:
           path: src/node_modules
           key: npm-v1-${{ hashFiles('src/package-lock.json') }}
-
       - run: docker-compose exec -T nginx npm ci
         if: ${{ !steps.cache-npm-ci.outputs.cache-hit }}
-      - run: docker-compose exec -T nginx npm run production
 
+      # # テストの実行
+      # - name: install php unit
+      #   run: docker-compose exec -T laravel composer require --dev phpunit/phpunit
+      # - name: PHPUnit
+      #   run: docker-compose exec -T laravel vendor/bin/phpunit tests/
+
+      - run: docker-compose exec -T nginx npm run production
+      
       # ECRへログイン
       - uses: aws-actions/amazon-ecr-login@v1
         id: amazon-ecr-login
       
+      # nginxイメージをプッシュ
       - name: Push nginx image to ecr
         env:
           DOCKER_BUILDKIT: 1
@@ -77,18 +86,19 @@ jobs:
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        
-        # phpのイメージのビルドとプッシュ
-        - name: Push php image to ecr
-          env:
-            DOCKER_BUILDKIT: 1
-            ECR_REGISTRY: ${{ steps.amazon-ecr-login.outputs.registry }}
-            ECR_REPOSITORY: ${{ env.SYSTEM_NAME }}-${{ env.ENV_NAME }}-${{ env.SERVICE_NAME }}-php
-          run: |
-            docker build \
-              --cache-from=$ECR_REGISTRY/$ECR_REPOSITORY:latest --build-arg BUILDKIT_INLINE_CACHE=1 . \
-              -f docker/php/Dockerfile \
-              -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-              -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      
+      # PHPイメージをプッシュ
+      - name: Push php image to ecr
+        env:
+          DOCKER_BUILDKIT: 1
+          ECR_REGISTRY: ${{ steps.amazon-ecr-login.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.SYSTEM_NAME }}-${{ env.ENV_NAME }}-${{ env.SERVICE_NAME }}-php
+        run: |
+          docker build \
+            --cache-from=$ECR_REGISTRY/$ECR_REPOSITORY:latest --build-arg BUILDKIT_INLINE_CACHE=1 . \
+            -f docker/laravel/Dockerfile \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      
