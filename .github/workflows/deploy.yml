@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - push_images_to_ecr
+      - push-images-to-ecr#5
 
 env:
   AWS_REGION: ap-northeast-1
