@@ -9,3 +9,12 @@ output "security_group_vpc_id" {
 output "subnet_public" {
   value = aws_subnet.public
 }
+
+output "subnet_private" {
+  value = aws_subnet.private
+}
+
+# ターゲットグループ作成時にVPCのIDが必要のため
+output "vpc_this_id" {
+  value = aws_vpc.this.id
+}
