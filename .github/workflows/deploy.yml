@@ -63,8 +63,6 @@ jobs:
       # ECRへログイン
       - uses: aws-actions/amazon-ecr-login@v1
         id: amazon-ecr-login
-
-      # nginxイメージをプッシュ
       - name: Push nginx image to ecr
         env:
           DOCKER_BUILDKIT: 1
