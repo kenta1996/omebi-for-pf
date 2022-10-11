@@ -5,4 +5,4 @@ ecs-task-definition-for-web.json
 *.tfstate
 *.tfstate.*
 *.tfvars”
-**/container_definitions
+**/container_definitions/*
