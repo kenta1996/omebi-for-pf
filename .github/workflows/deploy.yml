@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      # - push-images-to-ecr
+      - "again-build-terraform#16"
 
 env:
   AWS_REGION: ap-northeast-1
