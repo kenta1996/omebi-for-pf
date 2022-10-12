@@ -62,7 +62,7 @@ resource "aws_iam_role_policy" "s3" {
           "Action" : [
             "s3:GetObject"
           ],
-          "Resource" : "arn:aws:s3:::omobi-tfstate/${local.system_name}/${local.env_name}/cicd/app_${local.service_name}_*.tfstate"
+          "Resource" : "arn:aws:s3:::omobi-tfstate/pf/prod/cicd/app_omobi_*.tfstate"
         },
       ]
     }
