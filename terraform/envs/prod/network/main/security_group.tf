@@ -49,12 +49,12 @@ resource "aws_security_group" "vpc" {
   name   = "${aws_vpc.this.tags.Name}-vpc"
   vpc_id = aws_vpc.this.id
 
-  ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = true
-  }
+  # ingress {
+  #   from_port = 0
+  #   to_port   = 0
+  #   protocol  = "-1"
+  #   self      = true
+  # }
 
   egress {
     from_port   = 0
@@ -65,4 +65,14 @@ resource "aws_security_group" "vpc" {
   tags = {
     Name = "${aws_vpc.this.tags.Name}-vpc"
   }
+}
+
+resource "aws_security_group_rule" "ingress_db" {
+  description = "MySQL"
+  type              = "ingress"
+  from_port         = 3306
+  to_port           = 3306
+  protocol          = "tcp"
+  source_security_group_id = aws_security_group.web.id
+  security_group_id = aws_security_group.vpc.id
 }

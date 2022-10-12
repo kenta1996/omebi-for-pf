@@ -15,99 +15,15 @@ resource "aws_ecs_cluster" "this" {
 # タスク定義の作成
 resource "aws_ecs_task_definition" "this" {
   family = "${local.name_prefix}-${local.service_name}"
+
   task_role_arn = aws_iam_role.ecs_task_execution.arn
   execution_role_arn = aws_iam_role.ecs_task_execution.arn
-
-  network_mode = "awsvpc"
-
-  requires_compatibilities = [
-    "FARGATE",
-  ]
-
-  memory = "512"
-  cpu    = "256"
-
-  container_definitions = jsonencode(
-    [
-      {
-        name  = "nginx"
-        image = "${module.nginx.ecr_repository_this_repository_url}:latest"
-
-        portMappings = [
-          {
-            containerPort = 80
-            hostPort = 80
-            protocol      = "tcp"
-          }
-        ]
-
-        environment = []
-        secrets     = []
-
-        dependsOn = [
-          {
-            containerName = "php"
-            condition     = "START"
-          }
-        ]
-
-        # mountPoints = [
-        #   {
-        #     containerPath = "/var/run/php-fpm"
-        #     sourceVolume  = "php-fpm-socket"
-        #   }
-        # ]
-        logConfiguration = {
-          logDriver = "awslogs"
-          options = {
-            awslogs-group         = "/ecs/${local.name_prefix}-${(local.service_name)}/nginx"
-            awslogs-region        = data.aws_region.current.id
-            awslogs-stream-prefix = "ecs"
-          }
-        }
-      },
-      {
-        name  = "php"
-        image = "${module.php.ecr_repository_this_repository_url}:latest"
-
-        portMappings = []
-
-        environment = []
-        secrets = [
-          {
-            name      = "APP_KEY"
-            valueFrom = "/${local.system_name}/${local.env_name}/${local.service_name}/APP_KEY"
-          }
-        ]
-
-        # mountPoints = [
-        #   {
-        #     containerPath = "/var/run/php-fpm"
-        #     sourceVolume  = "php-fpm-socket"
-        #   }
-        # ]
-
-        logConfiguration = {
-          logDriver = "awslogs"
-          options = {
-            awslogs-group         = "/ecs/${local.name_prefix}-${(local.service_name)}/php"
-            awslogs-region        = data.aws_region.current.id
-            awslogs-stream-prefix = "ecs"
-          }
-        }
-      }
-    ]
-  )
-
-  # volume {
-  #   name = "php-fpm-socket"
-  # }
-
-  tags = {
-    Name = "${local.name_prefix}-${local.service_name}"
-  }
+  network_mode       = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  container_definitions = file("./container_definitions/service.json")
 }
-
 
 # サービスの作成
 resource "aws_ecs_service" "this" {
@@ -116,7 +32,7 @@ resource "aws_ecs_service" "this" {
   cluster = aws_ecs_cluster.this.arn
 
   capacity_provider_strategy {
-    capacity_provider = "FARGATE_SPOT"
+    capacity_provider = "FARGATE"
     base              = 0
     weight            = 1
   }
@@ -126,8 +42,8 @@ resource "aws_ecs_service" "this" {
   task_definition = aws_ecs_task_definition.this.arn
 
   desired_count                      = var.desired_count
-  deployment_minimum_healthy_percent = 100
-  deployment_maximum_percent         = 200
+  # deployment_minimum_healthy_percent = 100
+  # deployment_maximum_percent         = 200
 
   load_balancer {
     container_name   = "nginx"
@@ -135,10 +51,10 @@ resource "aws_ecs_service" "this" {
     target_group_arn = data.terraform_remote_state.routing_appomobi_link.outputs.lb_target_group_omobi_arn
   }
 
-  health_check_grace_period_seconds = 60
+  # health_check_grace_period_seconds = 60
 
   network_configuration {
-    assign_public_ip = false
+    assign_public_ip = true
     # ここはwebじゃないかな
     # publicと紐づける
     security_groups = [

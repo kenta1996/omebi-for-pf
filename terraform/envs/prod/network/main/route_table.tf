@@ -24,13 +24,17 @@ resource "aws_route_table_association" "public" {
 
 # private
 resource "aws_route_table" "private" {
-  for_each = var.azs
+  # for_each = var.azs
   vpc_id = aws_vpc.this.id
 
   tags = {
-    Name = "${aws_vpc.this.tags.Name}-private-${each.key}"
+    Name = "${aws_vpc.this.tags.Name}-private"
   }
+  # tags = {
+  #   Name = "${aws_vpc.this.tags.Name}-private-${each.key}"
+  # }
 }
+
 
 # ルートの設定はいらない
 # resource "aws_route" "nat_gateway_private" {
@@ -42,10 +46,10 @@ resource "aws_route_table" "private" {
 # }
 
 
-# ルートテーブルを2つ作ってる
+# ルートテーブルを2つ作ってる→1つに変えた
 resource "aws_route_table_association" "private" {
   for_each = var.azs
 
-  route_table_id = aws_route_table.private[each.key].id
+  route_table_id = aws_route_table.private.id
   subnet_id      = aws_subnet.private[each.key].id
 }
