@@ -3,6 +3,7 @@ resource "aws_subnet" "public" {
 
   availability_zone       = "${data.aws_region.current.name}${each.key}"
   cidr_block              = each.value.public_cidr
+  # パブリックIPの自動割り当て
   map_public_ip_on_launch = true
   vpc_id                  = aws_vpc.this.id
 
