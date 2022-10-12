@@ -1,0 +1,10 @@
+region: ap-northeast-1
+cluster: pf-prod-omobi
+service: pf-prod-omobi
+service_definition: ecs-service-def.json
+task_definition: ecs-task-def.json
+timeout: 20m0s
+plugins:
+  - name: tfstate
+    config:
+      url: s3://omobi-tfstate/pf/prod/cicd/app_omobi_v1.2.8.tfstate

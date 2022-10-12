@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      # - again-build-terraform
 
 env:
   AWS_REGION: ap-northeast-1
@@ -101,4 +100,13 @@ jobs:
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      
+
+      # ecspressoでecsへデプロイ
+      - name: Download ecspresso
+        uses: kayac/ecspresso@v1
+        with:
+          version: v1.7.12
+
+      - name: Deploy to ecs
+        run: ecspresso deploy --config config_prod.yaml
+        working-directory: ./ecspresso
