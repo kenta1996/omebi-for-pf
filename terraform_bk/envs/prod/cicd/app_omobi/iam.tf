@@ -1,4 +1,3 @@
-# cicd用のiamユーザの作成
 resource "aws_iam_user" "github" {
   name = "${local.name_prefix}-${local.service_name}-github"
 
@@ -7,7 +6,9 @@ resource "aws_iam_user" "github" {
   }
 }
 
-# IAMロールの作成
+# ECR関連の権限の設定
+# IAMユーザからIAMロールにAssumeRole(一時的に権限を付与)する
+# sts:TagSession:AuumeRoleではデフォルトでセッションタグの受け渡しが行われるので、権限の許可
 resource "aws_iam_role" "deployer" {
   name = "${local.name_prefix}-${local.service_name}-deployer"
 
@@ -34,13 +35,11 @@ resource "aws_iam_role" "deployer" {
   }
 }
 
-# IAMロールへのAWS管理ポリシー付与
+# IAMロールにAWS管理ポリシーを付与
 data "aws_iam_policy" "ecr_power_user" {
   arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
 
-# dataはディレクトリのtfstateでは管理していないリソースを参照する
-# AmazonEC2ContainerRegistryPowerUserを参照
 resource "aws_iam_role_policy_attachment" "role_deployer_policy_ecr_power_user" {
   role       = aws_iam_role.deployer.name
   policy_arn = data.aws_iam_policy.ecr_power_user.arn

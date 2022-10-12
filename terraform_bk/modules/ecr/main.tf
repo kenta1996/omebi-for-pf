@@ -1,3 +1,5 @@
+# Dockerイメージをコンテナレジストリに登録
+# {システム名}-{環境名}-{サービス名}に相当するプレフィックスをつける
 resource "aws_ecr_repository" "this" {
   name = var.name
 
@@ -6,6 +8,8 @@ resource "aws_ecr_repository" "this" {
   }
 }
 
+# ライフサイクルポリシーの設定
+# 最新の10個までイメージを残し、それより古いものは自動削除
 resource "aws_ecr_lifecycle_policy" "this" {
   policy = jsonencode(
     {
