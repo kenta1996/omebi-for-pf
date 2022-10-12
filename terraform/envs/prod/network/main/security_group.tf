@@ -55,16 +55,16 @@ resource "aws_security_group_rule" "ingress_web" {
 }
 
 # 内部向け
-resource "aws_security_group" "vpc" {
-  name   = "${aws_vpc.this.tags.Name}-vpc"
+resource "aws_security_group" "db_omobi" {
+  name   = "${aws_vpc.this.tags.Name}-db-omobi"
   vpc_id = aws_vpc.this.id
 
-  # ingress {
-  #   from_port = 0
-  #   to_port   = 0
-  #   protocol  = "-1"
-  #   self      = true
-  # }
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    self      = true
+  }
 
   egress {
     from_port   = 0
@@ -73,7 +73,7 @@ resource "aws_security_group" "vpc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "${aws_vpc.this.tags.Name}-vpc"
+    Name = "${aws_vpc.this.tags.Name}-db-omobi"
   }
 }
 
@@ -84,5 +84,5 @@ resource "aws_security_group_rule" "ingress_db" {
   to_port           = 3306
   protocol          = "tcp"
   source_security_group_id = aws_security_group.web.id
-  security_group_id = aws_security_group.vpc.id
+  security_group_id = aws_security_group.db_omobi.id
 }
