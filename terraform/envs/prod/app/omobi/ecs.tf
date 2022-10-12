@@ -42,8 +42,8 @@ resource "aws_ecs_service" "this" {
   task_definition = aws_ecs_task_definition.this.arn
 
   desired_count                      = var.desired_count
-  # deployment_minimum_healthy_percent = 100
-  # deployment_maximum_percent         = 200
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 200
 
   load_balancer {
     container_name   = "nginx"
@@ -51,11 +51,11 @@ resource "aws_ecs_service" "this" {
     target_group_arn = data.terraform_remote_state.routing_appomobi_link.outputs.lb_target_group_omobi_arn
   }
 
-  # health_check_grace_period_seconds = 60
+  # ヘルスチェックの猶予期間
+  health_check_grace_period_seconds = 120
 
   network_configuration {
     assign_public_ip = true
-    # ここはwebじゃないかな
     # publicと紐づける
     security_groups = [
       data.terraform_remote_state.network_main.outputs.security_group_web_id

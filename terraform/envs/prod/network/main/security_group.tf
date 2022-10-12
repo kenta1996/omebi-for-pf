@@ -44,6 +44,16 @@ resource "aws_security_group" "web" {
   }
 }
 
+resource "aws_security_group_rule" "ingress_web" {
+    type        = "ingress"
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks  = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.web.id
+}
+
 # 内部向け
 resource "aws_security_group" "vpc" {
   name   = "${aws_vpc.this.tags.Name}-vpc"

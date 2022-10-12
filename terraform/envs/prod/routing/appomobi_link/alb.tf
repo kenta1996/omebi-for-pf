@@ -65,7 +65,7 @@ resource "aws_lb_listener" "redirect_http_to_https" {
 resource "aws_lb_target_group" "omobi" {
   name = "${local.name_prefix}-omobi"
 
-  deregistration_delay = 60
+  # deregistration_delay = 60
   port                 = 80
   protocol             = "HTTP"
   target_type          = "ip"
@@ -73,12 +73,13 @@ resource "aws_lb_target_group" "omobi" {
 
   health_check {
     healthy_threshold   = 2
-    interval            = 30
+    interval            = 150
     matcher             = 200
     path                = "/"
+    # port                = 80
     port                = "traffic-port"
     protocol            = "HTTP"
-    timeout             = 5
+    timeout             = 120
     unhealthy_threshold = 2
   }
 
