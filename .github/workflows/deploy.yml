@@ -101,6 +101,11 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+      # 「.env.環境名」のファイルをs3にアップロードする
+      - name: Upload env file
+        run: aws s3 cp .env.$ENV_NAME s3://terraform-$SYSTEM_NAME-$ENV_NAME-$SERVICE_NAME-env-file/$IMAGE_TAG/.env
+        working-directory: application
+
       # ecspressoでecsへデプロイ
       - name: Download ecspresso
         uses: kayac/ecspresso@v1
