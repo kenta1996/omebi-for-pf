@@ -104,10 +104,10 @@ jobs:
 
       # ecspressoでecsへデプロイ
       - name: Download ecspresso
-        uses: kayac/ecspresso@v1
+        uses: kayac/ecspresso@v0
         with:
           version: v1.7.12
 
       - name: Deploy to ecs
-        run: ecspresso deploy --config config_$ENV_NAME.yaml
+        run: ecspresso deploy --config config_prod.yaml
         working-directory: ./ecspresso

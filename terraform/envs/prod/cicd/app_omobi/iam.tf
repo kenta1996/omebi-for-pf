@@ -46,6 +46,8 @@ resource "aws_iam_role_policy_attachment" "role_deployer_policy_ecr_power_user" 
   policy_arn = data.aws_iam_policy.ecr_power_user.arn
 }
 
+
+
 # S3読み取り権限追加
 resource "aws_iam_role_policy" "s3" {
   name = "s3"
