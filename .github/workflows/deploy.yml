@@ -111,4 +111,3 @@ jobs:
       - name: Deploy to ecs
         run: ecspresso deploy --config config_prod.yaml
         working-directory: ./ecspresso
-
