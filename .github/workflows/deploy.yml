@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - setting-rds#24
+      - setting-rds
 
 env:
   AWS_REGION: ap-northeast-1
