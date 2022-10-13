@@ -31,6 +31,11 @@ data "aws_lb_target_group" "this" {
 # data "aws_security_group" "vpc" {
 #   name = "${local.name_prefix}-main-vpc"
 # }
+
+data "aws_security_group" "db_omobi" {
+  name = "${local.name_prefix}-main-db-omobi"
+}
+
 data "aws_security_group" "web" {
   name = "${local.name_prefix}-main-web"
 }

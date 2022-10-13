@@ -33,6 +33,14 @@
     },
     {
       "cpu": 0,
+      "entryPoint": [
+        "sh",
+        "-c"
+      ],
+      "command": [
+        "php artisan config:cache && php artisan view:cache && php artisan route:cache && php artisan migrate --force && chmod -R 777 storage/* && php-fpm && composer install --optimize-autoloader --no-dev"
+      ],
+      "workingDirectory": "/application",
       "environment": [
         {
           "name": "LOG_CHANNEL",
@@ -68,6 +76,18 @@
         {
           "name": "APP_KEY",
           "valueFrom": "/{{ must_env `SYSTEM_NAME` }}/{{ must_env `ENV_NAME` }}/{{ must_env `SERVICE_NAME` }}/APP_KEY"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "/{{ must_env `SYSTEM_NAME` }}/{{ must_env `ENV_NAME` }}/{{ must_env `SERVICE_NAME` }}/DB_PASSWORD"
+        },
+        {
+          "name": "DB_HOST",
+          "valueFrom": "/{{ must_env `SYSTEM_NAME` }}/{{ must_env `ENV_NAME` }}/{{ must_env `SERVICE_NAME` }}/DB_HOST" 
+        },
+        {
+          "name": "DB_USERNAME",
+          "valueFrom": "/{{ must_env `SYSTEM_NAME` }}/{{ must_env `ENV_NAME` }}/{{ must_env `SERVICE_NAME` }}/DB_USERNAME" 
         }
       ],
       "volumesFrom": []
